@@ -17,12 +17,12 @@ with open('source/clustered_s31_DB/id_to_lex_class.json', encoding='utf-8') as f
 id2LPGlabel = {int(k): v for k, v in id2LPGlabel.items()}
 
 # === Load Fine-tuned BERT Model for LPG Classification ===
-classif_output_dir = "source/fine-tuned-models/classification/bert_base_arabic_camelbert_msa_pos_msa_lex_pos_stemgloss_with_UNK_relabeled"
+classif_output_dir = "source/fine-tuned-models/classification/"
 lex_model = AutoModelForTokenClassification.from_pretrained(classif_output_dir)
 lex_tokenizer = AutoTokenizer.from_pretrained(classif_output_dir)
 
 # === Load Fine-tuned BERT Model for LPG Clustering ===
-clust_output_dir = "source/fine-tuned-models/clustering/bert_base_arabic_camelbert_msa_pos_2000_clusters_lex_pos_stemgloss_with_UNK_relabeled"
+clust_output_dir = "source/fine-tuned-models/clustering/"
 clustering_model = AutoModelForTokenClassification.from_pretrained(clust_output_dir)
 clustering_tokenizer = AutoTokenizer.from_pretrained(clust_output_dir)
 
