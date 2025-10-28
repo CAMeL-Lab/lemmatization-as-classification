@@ -22,9 +22,8 @@ lex_model = AutoModelForTokenClassification.from_pretrained(classif_output_dir)
 lex_tokenizer = AutoTokenizer.from_pretrained(classif_output_dir)
 
 # === Load Fine-tuned BERT Model for LPG Clustering ===
-clust_output_dir = "source/fine-tuned-models/clustering/"
-clustering_model = AutoModelForTokenClassification.from_pretrained(clust_output_dir)
-clustering_tokenizer = AutoTokenizer.from_pretrained(clust_output_dir)
+clustering_model = AutoModelForTokenClassification.from_pretrained("CAMeL-Lab/camelbert-msa-pos-msa-lemma-clustering")
+clustering_tokenizer = AutoTokenizer.from_pretrained("CAMeL-Lab/camelbert-msa-pos-msa-lemma-clustering")
 
 
 # === Model Inference for a Single Chunk ===
