@@ -1,0 +1,11 @@
+accelerate==1.6.0
+datasets==3.5.0
+evaluate==0.4.3
+ipython==8.32.0
+sentence-transformers==3.4.1
+sentencepiece==0.2.0
+tokenizers==0.19.1
+torch==2.6.0
+torchao==0.10.0
+transformers==4.43.4
+camel-tools==1.5.5
