@@ -32,3 +32,38 @@ pip install -r requirements.txt
 5- [scripts](https://github.com/CAMeL-Lab/lemmatization-as-classification/tree/main/scripts) : All experiment execution scripts used for lemmatization, disambiguation, and evaluation in the paper.
 
 6- `main.py` and `run_pipeline.py`: the core scripts for executing all experiments presented in the paper.
+
+# Experiments and Reproducibility:
+
+Run the main script to reproduce the results presented in the paper using the configurable parameters below:
+
+```sh
+python main.py \
+  --datasets <INPUT_TXT_PATH> \
+  --granularities <INPUT_VARIANT> \
+  --experiments <TECHNIQUES>
+  --morph_db <MORPHOLOGY_DATABASE> \
+```
+
+| Parameter         | Available Options                                                        | Description                                              |
+| ----------------- | ------------------------------------------------------------------------ | -------------------------------------------------------- |
+| `datasets`      | `atb_dev`, `atb_test`, `barec`, `nemlar`, `wiki`, `quran`, `zaebuc`  | Choose one or multiple datasets to run experiments on    |
+| `granularities` | `lex`, `lex_pos`, `lex_pos_stemgloss`                                    | Select level of morphological granularity for prediction |
+| `experiments`   | `S2S`, `LexC+S2S`, `All+Rand`, `Top+Rand`, `Top+LogP`, `Top+S2S+LogP`, `Top+LexC+LogP`, `Top+LexC+S2S+LogP`, `Top+Clust+LogP`, `Top+Clust+S2S+LogP`                                                | Choose which lemmatization technique(s) to run           |
+
+
+### Single dataset, one granularity, one technique
+```bash
+python main.py \
+  --datasets atb_dev \
+  --granularities lex_pos_stemgloss \
+  --experiments Top+LogP
+```
+
+### Multiple datasets with corresponding granularities and techniques
+```bash
+python main.py \
+  --datasets zaebuc barec atb_test quran \
+  --granularities lex_pos_stemgloss lex_pos lex_pos_stemgloss lex \
+  --experiments Top+LogP,Top+Clust+S2S+LogP
+```
