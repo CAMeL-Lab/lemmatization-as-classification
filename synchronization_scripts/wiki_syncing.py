@@ -3,12 +3,12 @@ from helpers import clean_words_with_camel_arclean, disambig_output, compute_hig
 from helpers import static_stuff_to_with_ours, bert_disambig, calima_analyzer
 
 
-wiki_with_pos_df = pd.read_excel('original_datasets/wiki_news_dataset/WikiNews-26-06-2015-RefPOS.xlsx')
-wiki_nizar_pos_map_df = pd.read_excel('original_datasets/wiki_news_dataset/WikiNews-26-06-2015-RefPOS+Nizar Map.xlsx')
+wiki_with_pos_df = pd.read_excel('../data/Original Datasets/Wiki News Data/WikiNews-26-06-2015-RefPOS.xlsx')
+wiki_nizar_pos_map_df = pd.read_excel('../data/Original Datasets/Wiki News Data/WikiNews-26-06-2015-RefPOS+Map.xlsx')
 wiki_nizar_pos_map_df['MADAMIRA POS'] = wiki_nizar_pos_map_df['MADAMIRA POS'].fillna("space")
 
 
-wiki_df = pd.read_excel('original_datasets/wiki_news_dataset/WikiNews-26-06-2015-RefLemma.xlsx')
+wiki_df = pd.read_excel('../data/Original Datasets/Wiki News Data/WikiNews-26-06-2015-RefLemma.xlsx')
 wiki_df['sentence_index'] = wiki_df['sentNo'].fillna(method='ffill').astype(int)
 wiki_df['sentence_index'] = wiki_df['sentence_index'] - 1
 wiki_df['word_index'] = wiki_df.groupby('sentence_index').cumcount()
@@ -118,4 +118,6 @@ sync_df_filtered.insert(3, 'gold_lex', gold_lex_list)
 sync_df_filtered.insert(3, 'gold_pos', gold_pos_list)
 sync_df_filtered.insert(3, 'gold_stemgloss', gold_stemgloss_list)
 
-sync_df_filtered.to_csv("synced_wiki_data.csv", index=False)
+sync_df_filtered.rename({"word_wiki":"word"}, axis=1, inplace=True)
+sync_df_filtered = sync_df_filtered[['sentence_index', 'word_index', 'word', 'gold_lex', 'gold_pos']]
+sync_df_filtered.to_csv("../data/Synced Datasets/wiki data.csv", index=False)

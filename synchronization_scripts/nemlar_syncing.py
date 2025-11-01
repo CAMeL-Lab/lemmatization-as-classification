@@ -1,17 +1,10 @@
 import pandas as pd
 import re
-from helpers import nemlar_process_folder, fix_sentence_and_word_index, disambig_output, compute_highest_scoring_records_multi, normalize_text
+from helpers import fix_sentence_and_word_index, disambig_output, compute_highest_scoring_records_multi, normalize_text
 from helpers import static_stuff_to_with_ours, static_dict, bert_disambig, calima_analyzer
 
-folder_path = 'original_datasets/nemlar_orig_dataset/'
-
 # Process all XML files and get the data
-nemlar_df, file_counts_df = nemlar_process_folder(folder_path)
-
-# Ensure correct data types in main DataFrame
-nemlar_df['sentence_index'] = nemlar_df['sentence_index'].astype(int)
-nemlar_df['word_index'] = nemlar_df['word_index'].astype(int)
-
+nemlar_df = pd.read_csv('../data/Original Datasets/Nemlar Data/nemlar_data.csv')
 # Sort and reset index
 nemlar_df = nemlar_df.sort_values(by=['sentence_index', 'word_index']).reset_index(drop=True)
 
@@ -138,4 +131,6 @@ for i in range(len(result_df)):
         result_df.at[i, 'gold_lex'] = lex
         result_df.at[i, 'sync_status'] = 'force_done'
 
-result_df.to_csv("synced_nemlar_data.csv", index=False)
+result_df = result_df[['sentence_index', 'word_index', 'word_nemlar', 'gold_lex']]
+result_df.rename({"word_nemlar":"word"}, inplace=True, axis=1)
+result_df.to_csv("../data/Synced Datasets/nemlar data.csv", index=False)

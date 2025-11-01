@@ -3,7 +3,7 @@ from helpers import clean_words_with_camel_arclean, disambig_output, compute_hig
 from helpers import static_stuff_to_with_ours, ud_mada_pos_mapping, bert_disambig, calima_analyzer
 
 #### READING and CLEANING data ####
-file_path = "original_datasets/zabuc_orig_dataset/AR-all.extracted.corrected.analyzed.corrected-FINAL.tsv"
+file_path = "../data/Original Datasets/ZAEBUC Data/AR-all.extracted.corrected.analyzed.corrected-FINAL.tsv"
 zabuc_df = pd.read_csv(file_path, sep='\\t')
 zabuc_df = zabuc_df.dropna(subset=['Word'])
 
@@ -117,4 +117,6 @@ sync_df_filtered.insert(3, 'gold_lex', gold_lex_list)
 sync_df_filtered.insert(3, 'gold_pos', gold_pos_list)
 sync_df_filtered.insert(3, 'gold_stemgloss', gold_stemgloss_list)
 
-sync_df_filtered.to_csv("synced_zaebuc_data.csv", index=False)
+sync_df_filtered = sync_df_filtered[['sentence_index', 'word_index', 'word_zaebuc', 'gold_lex', 'gold_pos', 'gold_stemgloss']]
+sync_df_filtered.rename({'word_zaebuc' : 'word'}, axis=1, inplace=True)
+sync_df_filtered.to_csv("../data/Synced Datasets/zaebuc data.csv", index=False)

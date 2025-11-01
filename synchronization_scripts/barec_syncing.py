@@ -2,41 +2,11 @@ import pandas as pd
 from helpers import clean_words_with_camel_arclean, fix_sentence_and_word_index, disambig_output, compute_highest_scoring_records_multi, normalize_text
 from helpers import static_stuff_to_with_ours, static_dict, bert_disambig, calima_analyzer
 
-barec_df_categories = pd.read_csv('original_datasets/barec_orig_dataset/Lemma-Annotation-BAREC-P1-sources - Each Sentence Source & Book.csv')
-
-barec_df = pd.read_csv('original_datasets/barec_orig_dataset/Lemmatization-Annotated-Data - Barec-Data-P1.csv')
-
-barec_df_categories.rename({"Sentence ID" : "Sentence Index"}, axis=1, inplace=True)
-barec_df = barec_df.merge(barec_df_categories, on=['Batch Number', 'Sentence Index'], how='left')
-barec_df = clean_words_with_camel_arclean(barec_df, words_column="Word")
-
-
-### CLEANING AND STRUCTURING DATA ###
-barec_df['Chosen Output'] = barec_df['Chosen Output'].fillna('')
-barec_df[['lex', 'pos', 'gloss']] = barec_df['Chosen Output'].str.split('---', expand=True)
-barec_df.drop('Chosen Output', axis=1, inplace=True)
-barec_df
-
-# Double Checking that all puncs are correct
-barec_df.loc[barec_df['Word'] == '-', ['lex', 'gloss']] = '-'
-barec_df.loc[barec_df['Word'] == '-', ['pos']] = 'punc'
-condition = (barec_df['lex'] == '') & barec_df['gloss'].notna() & (barec_df['pos'] == 'punc')
-barec_df.loc[condition, 'lex'] = barec_df['gloss']
-barec_df.loc[condition, 'Word'] = barec_df['gloss']
-barec_df.loc[barec_df['pos'] == 'punc', ['Word', 'gloss']] = barec_df['lex']
-barec_df.loc[barec_df['pos'] == 'digit', ['Word', 'gloss']] = barec_df['lex']
-
-# Starting from index 0
-barec_df.rename({"gloss": 'stemgloss', 'Sentence Index': "sentence_index", "Word Index": "word_index"}, axis=1, inplace=True)
-barec_df['sentence_index'] = barec_df['sentence_index']-1
-barec_df['word_index'] = barec_df['word_index']-1
-barec_df.rename({"Word" : "word"}, axis=1, inplace=True)
-
 # Reading BAREC Data Analysis
-barec_df_categories = pd.read_csv('../original_datasets/barec_orig_dataset/Lemma-Annotation-BAREC-P1-sources - Each Sentence Source & Book.csv')
+barec_df_categories = pd.read_csv('../data/Original Datasets/Barec Data/Lemma-Annotation-BAREC-P1-sources - Each Sentence Source & Book.csv')
 
 # Reading BAREC Data
-barec_df = pd.read_csv('../original_datasets/barec_orig_dataset/Lemmatization-Annotated-Data - Barec-Data-P1.csv')
+barec_df = pd.read_csv('../data/Original Datasets/Barec Data/Barec Data.csv')
 
 barec_df_categories.rename({"Sentence ID" : "Sentence Index"}, axis=1, inplace=True)
 barec_df = barec_df.merge(barec_df_categories, on=['Batch Number', 'Sentence Index'], how='left')
@@ -66,6 +36,8 @@ barec_df.rename({"Word" : "word"}, axis=1, inplace=True)
 # barec_df = barec_df.dropna(subset=['word']).reset_index(drop=True)
 barec_df = barec_df[barec_df['word'] != '']
 barec_df = fix_sentence_and_word_index(barec_df)
+
+barec_df['word'] = barec_df['word'].astype(str)
 
 # if there is no saved disambiguator output
 barec_output_df = disambig_output(bert_disambig, calima_analyzer, barec_df)
@@ -174,13 +146,6 @@ for i in range(len(sync_df_filtered)):
         sync_df_filtered.at[i, 'gold_stemgloss'] = stemgloss
         sync_df_filtered.at[i, 'sync_status'] = 'force_done'
 
-
-sync_df_filtered.rename(columns={'Comment': 'comments'}, inplace=True)
-
-# Update 'sync_status' where 'comments' is not NaN
-sync_df_filtered['sync_status'] = sync_df_filtered.apply(
-    lambda row: 'not ready' if pd.notna(row['comments']) else row['sync_status'], axis=1
-)
-
+sync_df_filtered = sync_df_filtered[['sentence_index', 'word_index', 'word', 'gold_lex', 'gold_pos', 'gold_stemgloss']]
 sync_df_filtered = fix_sentence_and_word_index(sync_df_filtered)
-sync_df_filtered.to_csv("synced_barec_data.csv", index=False)
+sync_df_filtered.to_csv('../data/Synced Datasets/barec data.csv', index=False)

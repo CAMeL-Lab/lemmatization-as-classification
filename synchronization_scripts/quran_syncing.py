@@ -3,72 +3,8 @@ import re
 from helpers import clean_words_with_camel_arclean, disambig_output, compute_highest_scoring_records_multi, normalize_text, lex_transliterate, quran_clean_columns, fix_word_index_with_increment
 from helpers import static_stuff_to_with_ours, static_dict, bert_disambig, calima_analyzer
 
-file_path = 'original_datasets/quran_orig_dataset/fullquran_analysis_magold5(prep_fixd).txt'
-
-# Open the file and read its contents into the text variable
-with open(file_path, 'r', encoding='utf-8') as file:
-    text = file.read()
-
-# Split the text into lines for processing
-lines = text.splitlines()
-
-# Initialize storage for results
-analysis_results = []
-current_word = None
-current_number = None
-current_lex = "UNK"
-current_kais_pos = "UNK"  # Store KAIS POS
-current_analysis_pos = "UNK"  # Store ANALYSIS POS
-processing_analysis = False  # Track if inside the ANALYSIS section
-
-for line in lines:
-    # Identify new word section
-    if line.startswith(";; WORD"):
-        current_word = line.split()[2]  # Extract the word
-        current_lex = "UNK"
-        current_kais_pos = "UNK"
-        current_analysis_pos = "UNK"
-        processing_analysis = False  # Reset when a new word starts
-    
-    # Extract KAIS lex and pos
-    elif line.startswith(";; KAIS") and current_word:
-        number_match = re.search(r"\((\d+:\d+:\d+:\d+)\)", line)
-        lex_match = re.search(r"LEM:([^|]+)", line)
-        pos_match = re.search(r"POS:([^|]+)", line)
-        
-        if number_match:
-            current_number = number_match.group(1)
-        if lex_match:
-            current_lex = lex_match.group(1).strip()
-        if pos_match:
-            current_kais_pos = pos_match.group(1).strip()  # Store KAIS POS
-    
-    # Detect start of ANALYSIS section
-    elif line.startswith(";;; ANALYSIS"):
-        processing_analysis = True  # Set flag to start extracting analysis
-    
-    # Extract lex and pos from ANALYSIS section if available
-    elif processing_analysis and (line.startswith("*1.0") or line.startswith("_1.0")):
-        lex_match = re.search(r"lex:([^\s]+)", line)
-        pos_match = re.search(r"pos:([^\s]+)", line)
-        
-        if not lex_match:
-            lex_match = re.search(r"lex:UNK", line)
-        if not pos_match:
-            pos_match = re.search(r"pos:UNK", line)
-        
-        if current_word and current_number:
-            lex_value = lex_match.group(1).strip() if lex_match else current_lex
-            current_analysis_pos = pos_match.group(1).strip() if pos_match else "UNK"  # Store ANALYSIS POS
-            analysis_results.append((current_word, current_number, lex_value, current_kais_pos, current_analysis_pos))
-
-# Convert Analysis results to DataFrame
-analysis_df = pd.DataFrame(analysis_results, columns=["Word", "Number", "Analysis_LEX", "KAIS_POS", "Analysis_POS"])
-analysis_df['Analysis_LEX'] = analysis_df['Analysis_LEX'].astype(str)   
-analysis_df['Analysis_LEX'] = analysis_df.apply(lambda row: lex_transliterate(row['Analysis_LEX']), axis=1)
-analysis_df['Word'] = analysis_df['Word'].astype(str)   
-analysis_df['Word'] = analysis_df.apply(lambda row: lex_transliterate(row['Word']), axis=1)
-
+file_path = '../data/Original Datasets/Quranic Data/quran_data.csv'
+analysis_df = pd.read_csv(file_path)
 # Assign sentence index
 sentence_index_column = -1
 sentence_indices = []
@@ -227,4 +163,6 @@ for i in range(len(sync_df_filtered)):
 kais_pos = kais_pos.reset_index(drop=True)
 sync_df_filtered['Kais_pos'] = kais_pos
 
-sync_df_filtered.to_csv("synced_quran_data.csv", index=False)
+sync_df_filtered = sync_df_filtered[['sentence_index','word_index','word_quranic','gold_lex','gold_pos']]
+sync_df_filtered.rename({"word_quranic":"word"}, axis=1, inplace=True)
+sync_df_filtered.to_csv("../data/Synced Datasets/quran data.csv", index=False)

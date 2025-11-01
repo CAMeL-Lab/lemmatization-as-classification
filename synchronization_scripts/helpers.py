@@ -558,7 +558,7 @@ def compute_highest_scoring_records_multi(df, salma_output_df, lex_pos_flag=Fals
 
         if data == 'barec':
             result = merged_df[
-                ['sentence_index', 'word_index', 'word' + ref_tag, 'lex' + input_tag, 'pos' + input_tag, 'stemgloss' + input_tag,  'adjusted_lex' + input_tag, 'lex' + ref_tag, 'adjusted_lex' + ref_tag, 'pos' + ref_tag, 'stemgloss' + ref_tag, 'lex_score', 'pos_score','stemgloss_f1', 'stemgloss_precision', 'stemgloss_recall', 'sync_score', 'pos_lex_logprob', 'lex_logprob', 'Comment', 'Status', 'Source', 'Book']
+                ['sentence_index', 'word_index', 'word' + ref_tag, 'lex' + input_tag, 'pos' + input_tag, 'stemgloss' + input_tag,  'adjusted_lex' + input_tag, 'lex' + ref_tag, 'adjusted_lex' + ref_tag, 'pos' + ref_tag, 'stemgloss' + ref_tag, 'lex_score', 'pos_score','stemgloss_f1', 'stemgloss_precision', 'stemgloss_recall', 'sync_score', 'pos_lex_logprob', 'lex_logprob', 'Source', 'Book']
             ]
         elif data == 'zaebuc':
             result = merged_df[
