@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description="Run full disambiguation pipeline")
 parser.add_argument('--datasets', nargs='+', default=['atb_dev'], help='List of dataset names')
 parser.add_argument('--granularities', nargs='+', default=['lex_pos_stemgloss'], help='List of corresponding granularities')
 parser.add_argument('--experiments', type=str, default='S2S,LexC+S2S', help='Comma-separated experiment names')
+parser.add_argument('--morph_db',type=str,required=True,help='Path to the morphological database file')
 args = parser.parse_args()
 
 # Set up experiment config mapping
@@ -37,6 +38,7 @@ selected_experiments = [experiment_mapping[name] for name in args.experiments.sp
 globals()['dataset_names'] = args.datasets
 globals()['granularities'] = args.granularities
 globals()['experiments'] = selected_experiments
+globals()['morph_db'] = args.morph_db
 
 # Run full script
 exec(open(os.path.join('run_pipeline.py')).read())

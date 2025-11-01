@@ -16,8 +16,8 @@ for idx, data_name in enumerate(dataset_names):
     print(f"\n=== Processing dataset: {data_name} with granularity: {granularity} ===")
 
     # === Load and preprocess your data ===
-    s2s_df = pd.read_csv(f'source/data/s2s_output_data/{data_name}_s2s_output.csv')
-    df = pd.read_csv(f'source/data/synced_data/{data_name}.csv')
+    s2s_df = pd.read_csv(f'data/S2S Output Files/{data_name}_predictions.csv')
+    df = pd.read_csv(f'data/Synced Datasets/{data_name} data.csv')
 
     if 'gold_pos' in df.columns:
         df.rename(columns={'gold_pos': 'pos'}, inplace=True)
@@ -45,10 +45,10 @@ for idx, data_name in enumerate(dataset_names):
 
     for config in experiments:
         print(f"  → Running experiment: {config['name']}")
-
         final_df, metrics= evaluate_disambiguation_with_sentences(
             df=df,
             s2s_df = s2s_df,
+            morph_db = morph_db,
             data_name=data_name,
             word_column='word',
             granularity=granularity,
