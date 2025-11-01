@@ -7,19 +7,19 @@ import json
 from .disambig_utils import map_lpg_info, chunk_sentence
 
 # === Load ID-to-Cluster Mapping for Model Outputs ===
-with open('source/clustered_s31_DB/id_to_cluster.json', encoding='utf-8') as f:
+with open('LPG_clusters_and_classes/id_to_cluster.json', encoding='utf-8') as f:
     id2cluster = json.load(f)
 id2cluster = {int(k): v for k, v in id2cluster.items()}
 
 # === Load ID-to-LPG Label Mapping for Model Outputs ===
-with open('source/clustered_s31_DB/id_to_lex_class.json', encoding='utf-8') as f:
+with open('LPG_clusters_and_classes/id_to_lex_class.json', encoding='utf-8') as f:
     id2LPGlabel = json.load(f)
 id2LPGlabel = {int(k): v for k, v in id2LPGlabel.items()}
 
 # === Load Fine-tuned BERT Model for LPG Classification ===
-classif_output_dir = "source/fine-tuned-models/classification/"
-lex_model = AutoModelForTokenClassification.from_pretrained(classif_output_dir)
-lex_tokenizer = AutoTokenizer.from_pretrained(classif_output_dir)
+# classif_output_dir = "source/fine-tuned-models/classification/"
+# lex_model = AutoModelForTokenClassification.from_pretrained(classif_output_dir)
+# lex_tokenizer = AutoTokenizer.from_pretrained(classif_output_dir)
 
 # === Load Fine-tuned BERT Model for LPG Clustering ===
 clustering_model = AutoModelForTokenClassification.from_pretrained("CAMeL-Lab/camelbert-msa-pos-msa-lemma-clustering")

@@ -3,16 +3,10 @@ import pandas as pd
 from camel_tools.morphology.database import MorphologyDB
 from camel_tools.morphology.analyzer import Analyzer
 from camel_tools.disambig.bert import BERTUnfactoredDisambiguator
-
-
 from .modeling import rename_and_prepare_input
 
 # === Load the S31 Morphological Database with Encoded LPG and Cluster Assignments ===
-s31_db_path = 'source/clustered_s31_DB/latest_full_s31_in_2000_cluster_lex_pos_stemgloss.csv'
-final_s31_lex = pd.read_csv(s31_db_path)
-
-# === Load the S31 Morphological Database with Encoded LPG and Cluster Assignments ===
-s31_db_path = 'source/clustered_s31_DB/latest_full_s31_in_2000_cluster_lex_pos_stemgloss.csv'
+s31_db_path = 'LPG_clusters_and_classes/LPG_clusters.csv'
 final_s31_lex = pd.read_csv(s31_db_path)
 
 # Rename relevant columns for clarity and consistency
@@ -24,13 +18,6 @@ final_s31_lex.rename(columns={
 # === Create Mapping from LPG String to Encoded Class and Cluster ID ===
 LPG_to_encoded_class = final_s31_lex.set_index('lex_pos_stemgloss')[['LPG_encoded', 'clusters']].to_dict()
 
-
-### Loading the disambiguator with calime-s31 DB and NOAN_PROP Backoff
-back_off = 'NOAN_PROP'
-db = MorphologyDB('source/Morphological_DB/calima-msa-s31_0.4.2.utf8.db')
-calima_analyzer = Analyzer(db, back_off)
-bert_disambig = BERTUnfactoredDisambiguator.pretrained('msa', top = 5000, pretrained_cache=False)
-bert_disambig._analyzer = calima_analyzer
 
 # === Select the Best Disambiguation Option Based on Classification or Clustering ===
 def select_top_disambiguation(df, disambig_df, s2s_df, use_s2s=False, classification = False, clustering=False):
@@ -195,6 +182,7 @@ def merge_with_gold(df, final_df, data='', eval='lex'):
 def evaluate_disambiguation_with_sentences(
     df,
     s2s_df,
+    morph_db,
     data_name,
     word_column='word',
     sentence_column_name='sentence_index',
@@ -204,57 +192,13 @@ def evaluate_disambiguation_with_sentences(
     analyzer_set='top',  # 'top' or 'all'
     tagger=True  # True to use the tagger, False to use only the analyzer
 ):
-    """
-    Evaluate disambiguation performance using a given selection technique and output granularity.
-
-    Parameters:
-    ----------
-    df : pd.DataFrame
-        The input DataFrame containing the words and gold standard annotations.
-
-    data_name : str
-        A string identifier used for naming the output CSV file.
-
-    word_column : str, default='word'
-        The name of the column in `df` that contains the word tokens.
-
-    sentence_column_name : str, default='sentence_index'
-        The name of the column in `df` that contains the sentence index for each word.
-
-    word_column_name : str, default='word_index'
-        The name of the column in `df` that contains the word index within each sentence.
-
-    technique : str, default='logP'
-        The disambiguation selection methodology to apply. Options include:
-        - 'logp': Selects the top candidate based on the highest `pos_lex_logprob`.
-        - 'rand': Applies deterministic random selection based on `original_index`.
-        - 's2s_logp': First selects based on logp, then filters using the S2S model's predicted lemma.
-
-    granularity : str, default='lex'
-        The level of granularity used for evaluation. Options are:
-        - 'lex'       : Evaluate using lexical match only (L).
-        - 'lex_pos'   : Evaluate using lexical and POS match (LP).
-        - 'lex_pos_stemgloss' : Evaluate using lexical, POS, and gloss match (LPG).
-
-    analyzer_set : str, default='top'
-        Defines which analyses to consider from the disambiguator/analyzer.
-        - 'top': Use only top-scoring analyses (score == 1).
-        - 'all': Use all analyses returned.
-
-    tagger : bool, default=True
-        Whether to use the tagger for disambiguation.
-        - True : Use the BERT-based tagger (e.g., CALIMA BERT).
-        - False: Use only the morphological analyzer (e.g., CALIMA analyzer).
-
-    Returns:
-    -------
-    top1_df : pd.DataFrame
-        DataFrame containing the selected (top-1) disambiguation result per word.
-
-    disambig_df : pd.DataFrame
-        DataFrame containing all analyses or disambiguation results prior to selection.
-    """
-
+    
+    ## Loading the disambiguator with calime-s31 DB and NOAN_PROP Backoff
+    back_off = 'NOAN_PROP'
+    db = MorphologyDB(morph_db)
+    calima_analyzer = Analyzer(db, back_off)
+    bert_disambig = BERTUnfactoredDisambiguator.pretrained('msa', top = 5000, pretrained_cache=False)
+    bert_disambig._analyzer = calima_analyzer
 
     # === Step 1: Prepare list of tokenized sentences and their original indices ===
     sentences_list = []
