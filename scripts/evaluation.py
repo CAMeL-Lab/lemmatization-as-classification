@@ -141,7 +141,7 @@ def get_evaluatble_data(df, dataset_type='atb'):
         df_gold_dev2 = df_gold_dev2.loc[:, ~df_gold_dev2.columns.duplicated()]
 
     else:
-        raise ValueError(f"Unsupported dataset_type: {dataset_type}")
+        df_gold_dev2 = df
 
     return df_gold_dev2
 
@@ -212,9 +212,11 @@ def evaluate_disambiguation_with_sentences(
 
         df = get_evaluatble_data(df, dataset_type=data_name)
         # === Compute metrics based on granularity ===
-        results['lex_accuracy'] = (df['lex'] == df['gold_lex']).mean() * 100
-
-        return df, results
+        if granularity != '':
+            results['lex_accuracy'] = (df['lex'] == df['gold_lex']).mean() * 100
+            return df, results
+        else:
+            return df, ''
     
     if technique == 'LexC+S2S':
         results = {}
@@ -446,7 +448,6 @@ def evaluate_disambiguation_with_sentences(
         final_df = final_df.reset_index(drop=True)
         if 'sync_status' in df.columns:
             final_df['sync_status'] = df['sync_status']
-        # final_df = merge_with_gold(df, final_df, data = data_name, eval=granularity)
 
     elif technique == 'clust_s2s_logp':
         print("Step 1: Preparing input and S2S predictions...")
