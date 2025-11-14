@@ -8,7 +8,7 @@ Here's how you can set up the environment using conda (assuming you have conda a
 
 
 ```bash
-https://github.com/CAMeL-Lab/lemmatization-as-classification.git
+git clone https://github.com/CAMeL-Lab/lemmatization-as-classification.git
 cd lemmatization-as-classification
 
 conda create -n lemma_class_env python=3.12.8
