@@ -16,20 +16,29 @@ for idx, data_name in enumerate(dataset_names):
     print(f"\n=== Processing dataset: {data_name} with granularity: {granularity} ===")
 
     # === Load and preprocess your data ===
-    s2s_df = pd.read_csv(f'data/S2S Output Files/{data_name}_predictions.csv')
+    use_s2s = any(exp['technique'] in ['s2s', 's2s_logp', 'lexc_s2s_logp', 'clust_s2s_logp']
+              for exp in experiments)
+              
+    # s2s_df = pd.read_csv(f'data/S2S Output Files/{data_name}_predictions.csv')
+    if use_s2s:
+        print("→ Loading S2S predictions...")
+        s2s_df = pd.read_csv(f"data/S2S Output Files/{data_name}_predictions.csv")
+        s2s_df['pos'] = df['pos']
+        s2s_df['word_index'] = df['word_index']
+        s2s_df['sentence_index'] = df['sentence_index']
+        s2s_df.loc[s2s_df['pos'] == 'punc', 'predicted_lemma'] = s2s_df['word']
+        s2s_df.loc[s2s_df['pos'] == 'digit', 'predicted_lemma'] = s2s_df['word']
+        df['s2s_predicted_lemma'] = s2s_df['predicted_lemma']
+    else:
+        print("→ S2S not selected — skipping S2S predictions.")
+        s2s_df = pd.DataFrame()
+
     df = pd.read_csv(f'data/Synced Datasets/{data_name} data.csv')
 
     if 'gold_pos' in df.columns:
         df.rename(columns={'gold_pos': 'pos'}, inplace=True)
 
     df = df.loc[:, ~df.columns.duplicated()]
-
-    s2s_df['pos'] = df['pos']
-    s2s_df['word_index'] = df['word_index']
-    s2s_df['sentence_index'] = df['sentence_index']
-    s2s_df.loc[s2s_df['pos'] == 'punc', 'predicted_lemma'] = s2s_df['word']
-    s2s_df.loc[s2s_df['pos'] == 'digit', 'predicted_lemma'] = s2s_df['word']
-    df['s2s_predicted_lemma'] = s2s_df['predicted_lemma']
 
     arabic_diacritics = re.compile(r'[\u064B-\u0652\u0670\u0653\u0654\u0655]')
     df['word'] = df['word'].astype(str).apply(lambda x: arabic_diacritics.sub('', x))
