@@ -1,6 +1,6 @@
 # Lemmatization as Classification 
 
-This repository contains the code and resources associated with the paper on **Lemmatization as a Classification Task: Results from Arabic across Multiple Genres**.  
+This repository contains the code and resources associated with the paper on [**Lemmatization as a Classification Task: Results from Arabic across Multiple Genres**.  ](https://aclanthology.org/2025.emnlp-main.1525/)
 
 
 # Requirements:
